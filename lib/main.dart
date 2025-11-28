@@ -9,6 +9,9 @@ import 'firebase_options.dart';
 import 'services/auth_providers.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/verify_email_screen.dart';
+import 'screens/lineup_screen.dart';
 import 'screens/team_select_screen.dart';
 import 'screens/matches_screen.dart';
 import 'screens/score_screen.dart';
@@ -57,9 +60,27 @@ final _routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
         path: '/team-select',
         name: 'team-select',
         builder: (context, state) => const TeamSelectScreen(),
+      ),
+      GoRoute(
+        path: '/lineup/:matchId',
+        name: 'lineup',
+        builder: (context, state) {
+          final matchId = state.pathParameters['matchId']!;
+          return LineupScreen(matchId: matchId);
+        },
+      ),
+      GoRoute(
+        path: '/verify',
+        name: 'verify',
+        builder: (context, state) => const VerifyEmailScreen(),
       ),
       GoRoute(
         path: '/matches/:teamId',
@@ -81,10 +102,17 @@ final _routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final user = authState.asData?.value;
       final loggingIn = state.uri.path == '/login';
+      final registering = state.uri.path == '/register';
+      final verifying = state.uri.path == '/verify';
       if (user == null) {
-        return loggingIn ? null : '/login';
+        return (loggingIn || registering) ? null : '/login';
       }
-      if (loggingIn) return '/';
+      // If not verified, force to verify page
+      if (!user.emailVerified) {
+        if (verifying) return null;
+        return '/verify';
+      }
+      if (loggingIn || registering || verifying) return '/';
       return null;
     },
   );

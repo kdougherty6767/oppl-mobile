@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/selection_providers.dart';
 import '../services/auth_providers.dart';
 
@@ -32,13 +33,12 @@ class HomeScreen extends ConsumerWidget {
             Text('Selected team: ${selectedTeamId ?? "none"}'),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pushNamed('/team-select'),
+              onPressed: () => context.push('/team-select'),
               child: const Text('Choose Team'),
             ),
             if (selectedTeamId != null)
               ElevatedButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed('/matches/$selectedTeamId'),
+                onPressed: () => context.push('/matches/$selectedTeamId'),
                 child: const Text('View Matches'),
               ),
           ],

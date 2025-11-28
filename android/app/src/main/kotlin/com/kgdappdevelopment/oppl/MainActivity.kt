@@ -1,4 +1,4 @@
-package com.example.oppl_mobile
+package com.kgdappdevelopment.oppl
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAU-fFYeZLwZDHke958-NBKokzannkh1IM',
-    appId: '1:984140450698:android:d138c7946af165827e1673',
+    appId: '1:984140450698:android:e91ad4e905370b307e1673',
     messagingSenderId: '984140450698',
     projectId: 'oppl-scoring',
     storageBucket: 'oppl-scoring.firebasestorage.app',
@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'oppl-scoring.firebasestorage.app',
     iosBundleId: 'com.example.opplMobile',
   );
+
 }

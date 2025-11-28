@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../services/auth_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -71,6 +72,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ElevatedButton(
               onPressed: _busy ? null : _login,
               child: _busy ? const CircularProgressIndicator() : const Text('Sign in'),
+            ),
+            TextButton(
+              onPressed: _busy ? null : () => context.push('/register'),
+              child: const Text('Need an account? Register'),
             ),
           ],
         ),

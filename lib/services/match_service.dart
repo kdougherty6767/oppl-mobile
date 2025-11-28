@@ -20,8 +20,10 @@ class MatchService {
         .where('awayTeamId', isEqualTo: teamId)
         .snapshots();
 
-    return StreamGroup.merge([homeStream, awayStream]).map((query) {
-      final matches = query.docs.map((d) => Match.fromMap(d.id, d.data())).toList();
+    // Emit combined home+away on every change.
+    return StreamZip([homeStream, awayStream]).map((snaps) {
+      final allDocs = [...snaps[0].docs, ...snaps[1].docs];
+      final matches = allDocs.map((d) => Match.fromMap(d.id, d.data())).toList();
       matches.sort((a, b) => a.week.compareTo(b.week));
       return matches;
     });
@@ -37,6 +39,14 @@ class MatchService {
     final data = snap.data();
     if (data == null) return null;
     return Match.fromMap(snap.id, data);
+  }
+
+  Future<void> updateScorecard(String id, Map<String, dynamic> scorecard) {
+    return _db.collection(FsPaths.matches).doc(id).update({'scorecard': scorecard});
+  }
+
+  Future<void> updateStatus(String id, String status) {
+    return _db.collection(FsPaths.matches).doc(id).update({'status': status});
   }
 }
 

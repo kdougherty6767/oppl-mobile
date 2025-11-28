@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -9,7 +11,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.oppl_mobile"
+    namespace = "com.kgdappdevelopment.oppl"
     compileSdk = flutter.compileSdkVersion
     // Align NDK version with Firebase plugins
     ndkVersion = "27.0.12077973"
@@ -24,8 +26,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.oppl_mobile"
+        // Unique Application ID
+        applicationId = "com.kgdappdevelopment.oppl"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         // Firebase Android SDKs require minSdk 23+
@@ -35,11 +37,35 @@ android {
         versionName = flutter.versionName
     }
 
+    // Load signing config from key.properties if present (not checked into VCS)
+    val keystorePropsFile = rootProject.file("key.properties")
+    val keystoreProps = Properties()
+    if (keystorePropsFile.exists()) {
+        keystoreProps.load(keystorePropsFile.inputStream())
+    }
+
+    signingConfigs {
+        create("release") {
+            if (keystoreProps.isNotEmpty()) {
+                storeFile = keystoreProps["storeFile"]?.let { file(it as String) }
+                storePassword = keystoreProps["storePassword"] as String?
+                keyAlias = keystoreProps["keyAlias"] as String?
+                keyPassword = keystoreProps["keyPassword"] as String?
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // IMPORTANT: update the signingConfig below with your real release keystore
+            signingConfig = signingConfigs.getByName("release")
+            // Enable shrink/minify later if desired:
+            // isMinifyEnabled = true
+            // isShrinkResources = true
+            // proguardFiles(
+            //     getDefaultProguardFile("proguard-android-optimize.txt"),
+            //     "proguard-rules.pro"
+            // )
         }
     }
 }

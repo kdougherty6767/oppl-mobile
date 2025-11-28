@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/selection_providers.dart';
 import '../services/auth_providers.dart';
 import '../services/player_service.dart';
 import '../services/team_service.dart';
+import '../services/user_service.dart';
 
 class TeamSelectScreen extends ConsumerWidget {
   const TeamSelectScreen({super.key});
@@ -48,8 +50,7 @@ class TeamSelectScreen extends ConsumerWidget {
                     onTap: () {
                       ref.read(selectedTeamIdProvider.notifier).state = p.teamId;
                       if (context.mounted) {
-                        // navigate to matches for this team
-                        Navigator.of(context).pushReplacementNamed('/matches/${p.teamId}');
+                        context.go('/matches/${p.teamId}');
                       }
                     },
                   );

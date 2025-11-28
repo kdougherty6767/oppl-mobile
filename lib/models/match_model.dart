@@ -63,4 +63,36 @@ class Match {
       'createdAt': createdAt,
     }..removeWhere((k, v) => v == null);
   }
+
+  Match copyWith({
+    String? id,
+    String? hallSeasonId,
+    int? week,
+    dynamic date,
+    int? tableNumber,
+    String? homeTeamId,
+    String? awayTeamId,
+    String? homeTeamName,
+    String? awayTeamName,
+    String? format,
+    String? status,
+    Map<String, dynamic>? scorecard,
+    int? createdAt,
+  }) {
+    return Match(
+      id: id ?? this.id,
+      hallSeasonId: hallSeasonId ?? this.hallSeasonId,
+      week: week ?? this.week,
+      date: date ?? this.date,
+      tableNumber: tableNumber ?? this.tableNumber,
+      homeTeamId: homeTeamId ?? this.homeTeamId,
+      awayTeamId: awayTeamId ?? this.awayTeamId,
+      homeTeamName: homeTeamName ?? this.homeTeamName,
+      awayTeamName: awayTeamName ?? this.awayTeamName,
+      format: format ?? this.format,
+      status: status ?? this.status,
+      scorecard: scorecard ?? this.scorecard,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

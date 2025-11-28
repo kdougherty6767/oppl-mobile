@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/match_model.dart';
 import '../services/match_service.dart';
@@ -10,6 +11,10 @@ class MatchesScreen extends ConsumerWidget {
 
   final String teamId;
 
+  bool _goLineup(String status) {
+    return status == 'notStarted' || status == 'scheduled';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final matchesStream = ref.watch(matchServiceProvider).watchMatchesForTeam(teamId);
@@ -18,8 +23,7 @@ class MatchesScreen extends ConsumerWidget {
       appBar: AppBar(
         title: FutureBuilder(
           future: ref.read(teamServiceProvider).fetchTeam(teamId),
-          builder: (context, snap) =>
-              Text(snap.data?.name ?? 'Matches'),
+          builder: (context, snap) => Text(snap.data?.name ?? 'Matches'),
         ),
       ),
       body: StreamBuilder<List<Match>>(
@@ -43,8 +47,13 @@ class MatchesScreen extends ConsumerWidget {
               return ListTile(
                 title: Text('Week ${m.week} vs $opponent'),
                 subtitle: Text('Status: ${m.status}'),
+                trailing: Text(isHome ? 'Home' : 'Away'),
                 onTap: () {
-                  Navigator.of(context).pushNamed('/score/${m.id}', arguments: {'matchId': m.id});
+                  if (_goLineup(m.status)) {
+                    context.push('/lineup/${m.id}');
+                  } else {
+                    context.push('/score/${m.id}');
+                  }
                 },
               );
             },

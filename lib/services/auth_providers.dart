@@ -7,5 +7,6 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
 
 /// Stream of auth state changes.
 final authStateProvider = StreamProvider<User?>((ref) {
-  return ref.watch(firebaseAuthProvider).authStateChanges();
+  // userChanges emits on sign-in/out AND profile changes (including emailVerified after reload)
+  return ref.watch(firebaseAuthProvider).userChanges();
 });

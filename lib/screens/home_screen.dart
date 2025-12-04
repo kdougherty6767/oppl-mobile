@@ -36,6 +36,11 @@ class HomeScreen extends ConsumerWidget {
               onPressed: () => context.push('/team-select'),
               child: const Text('Choose Team'),
             ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () => context.push('/registration'),
+              child: const Text('Registration'),
+            ),
             if (selectedTeamId != null)
               ElevatedButton(
                 onPressed: () => context.push('/matches/$selectedTeamId'),

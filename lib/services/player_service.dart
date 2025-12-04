@@ -48,6 +48,43 @@ class PlayerService {
         .snapshots()
         .map((snap) => snap.docs.map((d) => Player.fromMap(d.id, d.data())).toList());
   }
+
+  Future<void> requestJoinTeam({
+    required String hallSeasonId,
+    required String teamId,
+    required String userId,
+  }) async {
+    await _db.collection(FsPaths.players).add({
+      'hallSeasonId': hallSeasonId,
+      'teamId': teamId,
+      'userId': userId,
+      'isCaptain': false,
+      'status': 'pending',
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
+  Future<String> createPendingTeamAndCaptain({
+    required String hallSeasonId,
+    required String teamName,
+    required String userId,
+  }) async {
+    final teamRef = await _db.collection(FsPaths.teams).add({
+      'hallSeasonId': hallSeasonId,
+      'name': teamName,
+      'status': 'pending',
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    await _db.collection(FsPaths.players).add({
+      'hallSeasonId': hallSeasonId,
+      'teamId': teamRef.id,
+      'userId': userId,
+      'isCaptain': true,
+      'status': 'pending',
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    return teamRef.id;
+  }
 }
 
 final playerServiceProvider = Provider<PlayerService>((ref) {

@@ -15,6 +15,9 @@ import 'screens/lineup_screen.dart';
 import 'screens/team_select_screen.dart';
 import 'screens/matches_screen.dart';
 import 'screens/score_screen.dart';
+import 'screens/registration_screen.dart';
+import 'screens/join_team_screen.dart';
+import 'screens/create_team_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -98,6 +101,27 @@ final _routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final matchId = state.pathParameters['matchId']!;
           return ScoreScreen(matchId: matchId);
+        },
+      ),
+      GoRoute(
+        path: '/registration',
+        name: 'registration',
+        builder: (context, state) => const RegistrationScreen(),
+      ),
+      GoRoute(
+        path: '/registration/join/:hallSeasonId',
+        name: 'join-team',
+        builder: (context, state) {
+          final hsId = state.pathParameters['hallSeasonId']!;
+          return JoinTeamScreen(hallSeasonId: hsId);
+        },
+      ),
+      GoRoute(
+        path: '/registration/create/:hallSeasonId',
+        name: 'create-team',
+        builder: (context, state) {
+          final hsId = state.pathParameters['hallSeasonId']!;
+          return CreateTeamScreen(hallSeasonId: hsId);
         },
       ),
     ],

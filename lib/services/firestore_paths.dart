@@ -6,4 +6,5 @@ class FsPaths {
   static const teams = 'teams';
   static const players = 'players';
   static const matches = 'matches';
+  static const teamMembers = 'teamMembers';
 }

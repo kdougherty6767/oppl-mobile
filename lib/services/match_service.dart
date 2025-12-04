@@ -66,6 +66,20 @@ class MatchService {
       return Match.fromMap(snap.id, data);
     });
   }
+
+  Future<void> updateAgreement({
+    required String id,
+    bool? homeAgrees,
+    bool? awayAgrees,
+    String? scorecardStatus,
+  }) {
+    final data = <String, dynamic>{};
+    if (homeAgrees != null) data['homeAgrees'] = homeAgrees;
+    if (awayAgrees != null) data['awayAgrees'] = awayAgrees;
+    if (scorecardStatus != null) data['scorecardStatus'] = scorecardStatus;
+    if (data.isEmpty) return Future.value();
+    return _db.collection(FsPaths.matches).doc(id).update(data);
+  }
 }
 
 final matchServiceProvider = Provider<MatchService>((ref) {

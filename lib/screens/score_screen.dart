@@ -129,8 +129,8 @@ class _ScoreScreenState extends ConsumerState<ScoreScreen> {
     final rounds = (payload['rounds'] as List).map((e) => Map<String, dynamic>.from(e)).toList();
     final games = List<dynamic>.from(rounds[roundIdx]['games'] as List);
     final game = Map<String, dynamic>.from(games[gameIdx]);
-    final homeCap = game['homeShortHandCap'] == true || game['shortHandedWinCap'] == true;
-    final awayCap = game['awayShortHandCap'] == true || game['shortHandedWinCap'] == true;
+    final homeCap = game['homeShortHandCap'] == true;
+    final awayCap = game['awayShortHandCap'] == true;
     final homeWinValue = homeCap ? 8 : 10;
     final awayWinValue = awayCap ? 8 : 10;
 
@@ -162,11 +162,26 @@ class _ScoreScreenState extends ConsumerState<ScoreScreen> {
     payload['rounds'] = rounds;
     final newScorecard = Map<String, dynamic>.from(_match!.scorecard ?? {});
     newScorecard['payload'] = payload;
-    await ref.read(matchServiceProvider).updateScorecard(_match!.id, newScorecard);
+    // reset agree flags on score change
+    final agreeReset = {
+      'homeAgrees': false,
+      'awayAgrees': false,
+      'scorecardStatus': 'pending',
+    };
+    await ref.read(matchServiceProvider).updateMatch(_match!.id, {
+      'scorecard': newScorecard,
+      ...agreeReset,
+    });
     final status = _allGamesScored(payload) ? 'complete' : 'inProgress';
     await ref.read(matchServiceProvider).updateStatus(_match!.id, status);
     setState(() {
-      _match = _match!.copyWith(scorecard: newScorecard, status: status);
+      _match = _match!.copyWith(
+        scorecard: newScorecard,
+        status: status,
+        homeAgrees: false,
+        awayAgrees: false,
+        scorecardStatus: 'pending',
+      );
       _saving = false;
     });
   }
@@ -184,8 +199,8 @@ class _ScoreScreenState extends ConsumerState<ScoreScreen> {
   ) {
     final initialHome = game['homeScore'] as int?;
     final initialAway = game['awayScore'] as int?;
-    final homeCap = game['homeShortHandCap'] == true || game['shortHandedWinCap'] == true;
-    final awayCap = game['awayShortHandCap'] == true || game['shortHandedWinCap'] == true;
+    final homeCap = game['homeShortHandCap'] == true;
+    final awayCap = game['awayShortHandCap'] == true;
     final myCap = isHomeTeam ? homeCap : awayCap;
     final oppCap = isHomeTeam ? awayCap : homeCap;
 
@@ -354,6 +369,15 @@ class _ScoreScreenState extends ConsumerState<ScoreScreen> {
               ),
             )
           : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: !_loading && _match != null && _allGamesScored(_match!.scorecard?['payload'] ?? {})
+          ? SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: _agreementBar(isHomeTeam),
+              ),
+            )
+          : null,
     );
   }
 
@@ -368,6 +392,56 @@ class _ScoreScreenState extends ConsumerState<ScoreScreen> {
       }
     }
     return true;
+  }
+
+  Widget _agreementBar(bool isHomeTeam) {
+    final homeAgrees = _match?.homeAgrees == true;
+    final awayAgrees = _match?.awayAgrees == true;
+    final both = homeAgrees && awayAgrees;
+    final myAgreed = isHomeTeam ? homeAgrees : awayAgrees;
+    final otherAgreed = isHomeTeam ? awayAgrees : homeAgrees;
+
+    final statusText = both
+        ? 'Both teams confirmed'
+        : myAgreed
+            ? 'Waiting for opponent to confirm'
+            : 'Confirm final score';
+
+    return Card(
+      color: both
+          ? Colors.green.shade100
+          : myAgreed
+              ? Colors.orange.shade100
+              : Colors.blue.shade100,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                statusText,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: both || myAgreed
+                  ? null
+                  : () async {
+                      await ref.read(matchServiceProvider).updateAgreement(
+                            id: _match!.id,
+                            homeAgrees: isHomeTeam ? true : _match?.homeAgrees,
+                            awayAgrees: isHomeTeam ? _match?.awayAgrees : true,
+                            scorecardStatus: both ? 'confirmed' : 'submitted',
+                          );
+                    },
+              child: Text(both ? 'Confirmed' : myAgreed ? 'Waiting' : 'I Agree'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

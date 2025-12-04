@@ -13,6 +13,9 @@ class Match {
   final int? scheduleVersion;
   final Map<String, dynamic>? scorecard;
   final int? createdAt;
+  final bool? homeAgrees;
+  final bool? awayAgrees;
+  final String? scorecardStatus; // pending | submitted | confirmed
 
   Match({
     required this.id,
@@ -29,6 +32,9 @@ class Match {
     this.tableNumber,
     this.scorecard,
     this.createdAt,
+    this.homeAgrees,
+    this.awayAgrees,
+    this.scorecardStatus,
   });
 
   factory Match.fromMap(String id, Map<String, dynamic> data) {
@@ -47,6 +53,9 @@ class Match {
       scheduleVersion: (data['scheduleVersion'] as num?)?.toInt(),
       scorecard: data['scorecard'] as Map<String, dynamic>?,
       createdAt: (data['createdAt'] as num?)?.toInt(),
+      homeAgrees: data['homeAgrees'] as bool?,
+      awayAgrees: data['awayAgrees'] as bool?,
+      scorecardStatus: data['scorecardStatus'] as String?,
     );
   }
 
@@ -65,6 +74,9 @@ class Match {
       'scheduleVersion': scheduleVersion,
       'scorecard': scorecard,
       'createdAt': createdAt,
+      'homeAgrees': homeAgrees,
+      'awayAgrees': awayAgrees,
+      'scorecardStatus': scorecardStatus,
     }..removeWhere((k, v) => v == null);
   }
 
@@ -83,6 +95,9 @@ class Match {
     int? scheduleVersion,
     Map<String, dynamic>? scorecard,
     int? createdAt,
+    bool? homeAgrees,
+    bool? awayAgrees,
+    String? scorecardStatus,
   }) {
     return Match(
       id: id ?? this.id,
@@ -99,6 +114,9 @@ class Match {
       scheduleVersion: scheduleVersion ?? this.scheduleVersion,
       scorecard: scorecard ?? this.scorecard,
       createdAt: createdAt ?? this.createdAt,
+      homeAgrees: homeAgrees ?? this.homeAgrees,
+      awayAgrees: awayAgrees ?? this.awayAgrees,
+      scorecardStatus: scorecardStatus ?? this.scorecardStatus,
     );
   }
 }

@@ -22,6 +22,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  debugPrint(
+      'Firebase project: ${Firebase.app().options.projectId}, appId: ${Firebase.app().options.appId}');
   runApp(const ProviderScope(child: OpplApp()));
 }
 

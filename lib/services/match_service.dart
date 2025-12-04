@@ -20,12 +20,18 @@ class MatchService {
         .where('awayTeamId', isEqualTo: teamId)
         .snapshots();
 
-    // Emit combined home+away on every change.
+    // Emit combined home+away on every change, filtering to latest scheduleVersion.
     return StreamZip([homeStream, awayStream]).map((snaps) {
       final allDocs = [...snaps[0].docs, ...snaps[1].docs];
-      final matches = allDocs.map((d) => Match.fromMap(d.id, d.data())).toList();
-      matches.sort((a, b) => a.week.compareTo(b.week));
-      return matches;
+      final allMatches = allDocs.map((d) => Match.fromMap(d.id, d.data())).toList();
+      int maxVersion = 0;
+      for (final m in allMatches) {
+        final v = m.scheduleVersion ?? 0;
+        if (v > maxVersion) maxVersion = v;
+      }
+      final filtered = allMatches.where((m) => (m.scheduleVersion ?? 0) == maxVersion).toList();
+      filtered.sort((a, b) => a.week.compareTo(b.week));
+      return filtered;
     });
   }
 
@@ -33,8 +39,11 @@ class MatchService {
     return _db.collection(FsPaths.matches).doc(id).update(data);
   }
 
-  Future<Match?> fetchMatch(String id) async {
-    final snap = await _db.collection(FsPaths.matches).doc(id).get();
+  Future<Match?> fetchMatch(String id, {bool serverOnly = false}) async {
+    final snap = await _db
+        .collection(FsPaths.matches)
+        .doc(id)
+        .get(serverOnly ? const GetOptions(source: Source.server) : null);
     if (!snap.exists) return null;
     final data = snap.data();
     if (data == null) return null;
@@ -47,6 +56,15 @@ class MatchService {
 
   Future<void> updateStatus(String id, String status) {
     return _db.collection(FsPaths.matches).doc(id).update({'status': status});
+  }
+
+  Stream<Match?> watchMatch(String id) {
+    return _db.collection(FsPaths.matches).doc(id).snapshots().map((snap) {
+      if (!snap.exists) return null;
+      final data = snap.data();
+      if (data == null) return null;
+      return Match.fromMap(snap.id, data);
+    });
   }
 }
 

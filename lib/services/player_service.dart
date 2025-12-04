@@ -17,12 +17,28 @@ class PlayerService {
         .map((snap) => snap.docs.map((d) => Player.fromMap(d.id, d.data())).toList());
   }
 
+  Future<List<Player>> fetchPlayersForHallSeason(String hallSeasonId) async {
+    final snap = await _db
+        .collection(FsPaths.players)
+        .where('hallSeasonId', isEqualTo: hallSeasonId)
+        .get(const GetOptions(source: Source.server));
+    return snap.docs.map((d) => Player.fromMap(d.id, d.data())).toList();
+  }
+
   Stream<List<Player>> watchPlayersForTeam(String teamId) {
     return _db
         .collection(FsPaths.players)
         .where('teamId', isEqualTo: teamId)
         .snapshots()
         .map((snap) => snap.docs.map((d) => Player.fromMap(d.id, d.data())).toList());
+  }
+
+  Future<List<Player>> fetchPlayersForTeam(String teamId) async {
+    final snap = await _db
+        .collection(FsPaths.players)
+        .where('teamId', isEqualTo: teamId)
+        .get(const GetOptions(source: Source.server));
+    return snap.docs.map((d) => Player.fromMap(d.id, d.data())).toList();
   }
 
   Stream<List<Player>> watchPlayersForUser(String userId) {

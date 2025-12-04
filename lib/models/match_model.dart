@@ -10,6 +10,7 @@ class Match {
   final String awayTeamName;
   final String format;
   final String status;
+  final int? scheduleVersion;
   final Map<String, dynamic>? scorecard;
   final int? createdAt;
 
@@ -23,6 +24,7 @@ class Match {
     required this.awayTeamName,
     required this.format,
     required this.status,
+    this.scheduleVersion,
     this.date,
     this.tableNumber,
     this.scorecard,
@@ -42,6 +44,7 @@ class Match {
       awayTeamName: data['awayTeamName'] as String? ?? '',
       format: data['format'] as String? ?? '1man',
       status: data['status'] as String? ?? 'scheduled',
+      scheduleVersion: (data['scheduleVersion'] as num?)?.toInt(),
       scorecard: data['scorecard'] as Map<String, dynamic>?,
       createdAt: (data['createdAt'] as num?)?.toInt(),
     );
@@ -59,6 +62,7 @@ class Match {
       'awayTeamName': awayTeamName,
       'format': format,
       'status': status,
+      'scheduleVersion': scheduleVersion,
       'scorecard': scorecard,
       'createdAt': createdAt,
     }..removeWhere((k, v) => v == null);
@@ -76,6 +80,7 @@ class Match {
     String? awayTeamName,
     String? format,
     String? status,
+    int? scheduleVersion,
     Map<String, dynamic>? scorecard,
     int? createdAt,
   }) {
@@ -91,6 +96,7 @@ class Match {
       awayTeamName: awayTeamName ?? this.awayTeamName,
       format: format ?? this.format,
       status: status ?? this.status,
+      scheduleVersion: scheduleVersion ?? this.scheduleVersion,
       scorecard: scorecard ?? this.scorecard,
       createdAt: createdAt ?? this.createdAt,
     );
